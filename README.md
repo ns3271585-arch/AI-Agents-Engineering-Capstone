@@ -2,9 +2,15 @@
 
 A secure, persistent, multi-agent HR onboarding system built with LangGraph, Groq, SQLite checkpointing, human approval, guardrails, structured observability, FastAPI, and Docker.
 
-> **Training program:** Advanced Agentic AI Systems Engineering  
-> **Delivered by:** SDAIA Academy via Learning Space  
-> **Cohort/session dates:** **[ADD THE EXACT PROGRAM DATES BEFORE SUBMISSION]**
+> **Students:** Noura Almuqbil, Moudi Alhomoud, Shahad Alotaish
+
+> **Training program:** Advanced Agentic AI Systems Engineering
+ 
+> **Delivered by:** SDAIA Academy via Learning Space
+
+> **Trainer:** Mohammed Albeladi
+
+> **Cohort/session dates:** **August 2 - August 6 2026**
 
 ---
 
@@ -505,8 +511,8 @@ The executed notebook demonstrates:
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-cd HR-Onboarding-Agentic-System
+git clone https://github.com/ns3271585-arch/AI-Agents-Engineering-Capstone.git
+cd AI-Agents-Engineering-Capstone
 ```
 
 ### 2. Install dependencies
@@ -688,9 +694,9 @@ Replace the placeholders below with the team members’ names before submission.
 
 | Team Member | Main Responsibilities |
 |---|---|
-| **[TEAM MEMBER 1 NAME]** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
-| **[TEAM MEMBER 2 NAME]** | Specialized HR agents, function tools, templates, guardrails, and observability |
-| **[TEAM MEMBER 3 NAME]** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
+| **Moudi Alhomoud** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
+| **Shahad Alotaish** | Specialized HR agents, function tools, templates, guardrails, and observability |
+| **Noura Almuqbil** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
 
 ---
 
