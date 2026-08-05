@@ -34,7 +34,7 @@ Before finalization, the graph pauses at a genuine human-in-the-loop approval no
 
 After approval, an output guardrail creates a protected public summary in which sensitive information is masked. Immediately before adding the employee, the registration tool performs a second duplicate check. Only a new employee is written to the persistent registry; a duplicate is routed to a terminating duplicate-employee branch. The system then saves the final onboarding package, generated IT ticket, structured logs, and execution metrics.
 
-For production-readiness evidence, the repository includes a FastAPI application, Dockerfile, dependency file, `.gitignore`, Mermaid architecture diagram, generated artifacts, and an executed Colab notebook containing successful, failure, security, retry, persistence, and human-approval demonstrations.
+For production-readiness evidence, the repository includes a FastAPI application, Dockerfile, dependency file, `.gitignore`, architecture diagram, generated artifacts, and an executed Colab notebook containing successful, failure, security, retry, persistence, and human-approval demonstrations.
 
 ---
 
@@ -267,7 +267,7 @@ Agent creates an operational plan and performs requirements-tool calling, but it
 does not dynamically select the other agents. Specialized agents communicate by
 reading from and returning updates to the shared `OnboardingState`.
 
-The complete Mermaid architecture is available in
+The complete architecture is available in
 [`architecture.mmd`](architecture.mmd).
 
 ### 1. Nodes
