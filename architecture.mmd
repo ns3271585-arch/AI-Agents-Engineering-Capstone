@@ -1,162 +1,24 @@
 flowchart TD
-
-    %% =========================================================
-    %% INPUTS AND CENTRAL ORCHESTRATION
-    %% =========================================================
-    START([START])
-    INPUT[Candidate Input<br/>candidate_id, name, email, phone,<br/>resume, position, department,<br/>start_date, hired]
-    GRAPH[[LangGraph StateGraph<br/>Centralized graph orchestration]]
-    STATE[(Shared OnboardingState<br/>short-term workflow memory)]
-    CHECKPOINT[(SqliteSaver<br/>persistent checkpoints by thread_id)]
-
-    START --> INPUT
-    INPUT --> G1
-    GRAPH -. controls node order and routing .-> G1
-    STATE -. read/write shared state .- GRAPH
-    GRAPH -. compiled with .-> CHECKPOINT
-
-    %% =========================================================
-    %% SECURITY AND ELIGIBILITY NODES
-    %% =========================================================
-    subgraph S1[Security, Eligibility, and Duplicate Prevention Nodes]
-        G1[Node: input_guardrail<br/>Agent: Input Guardrail Agent]
-        G2[Node: employment_check<br/>Agent: Employment Status Agent]
-        G3[Node: employee_uniqueness_check<br/>Agent: Employee Registry Agent]
-        B1[Node: blocked<br/>Terminal security path]
-        B2[Node: not_hired<br/>Terminal eligibility path]
-        B3[Node: duplicate_employee<br/>Terminal duplicate path]
-    end
-
-    G1 -->|safe| G2
-    G1 -->|blocked| B1
-    G2 -->|hired| G3
-    G2 -->|not hired| B2
-    G3 -->|new employee| A1
-    G3 -->|candidate_id or email already exists| B3
-
-    %% =========================================================
-    %% SPECIALIZED AGENT NODES
-    %% =========================================================
-    subgraph S2[Specialized Multi-Agent Workflow Nodes]
-        A1[Node: coordinator<br/>Agent: Onboarding Coordinator Agent]
-        A2[Node: resume_analysis<br/>Agent: Resume Analysis Agent]
-        A3[Node: training_plan<br/>Agent: Training Plan Agent]
-        A4[Node: contract_notification<br/>Agent: Contract Notification Agent]
-        A5[Node: it_provisioning<br/>Agent: IT Provisioning Agent]
-        A6[Node: review<br/>Agent: Reviewer Agent]
-    end
-
-    A1 --> A2
-    A2 --> A3
-    A3 --> A4
-    A4 --> A5
-    A5 -->|IT request submitted| A6
-    A5 -->|retry_required and retry_count ≤ max_it_retries| A5
-
-    %% =========================================================
-    %% CONTROL, REVISION, HITL, AND FINALIZATION NODES
-    %% =========================================================
-    subgraph S3[Control, HITL, Registration, and Finalization Nodes]
-        C1[Node: prepare_revision<br/>Agent: Revision Coordinator]
-        C2{{Node: human_approval<br/>Real interrupt() / Command(resume=...)}}
-        C3[Node: output_guardrail<br/>Agent: Output Guardrail Agent]
-        C4[Node: employee_registration<br/>Agent: Employee Registry Agent]
-        C5[Node: finalize<br/>Agent: Finalization Agent]
-        C6[Node: rejected_end<br/>Terminal rejection path]
-        END([END])
-    end
-
-    A6 -->|quality_score ≥ 80 and approved| C2
-    A6 -->|quality below threshold and revision_count < max_revisions| C1
-    C1 -->|increment revision_count| A3
-
-    C2 -->|approved| C3
-    C2 -->|revise| C1
-    C2 -->|rejected| C6
-
-    C3 --> C4
-    C4 -->|second uniqueness check passes| C5
-    C4 -->|duplicate detected before write| B3
-    C5 --> END
-
-    B1 --> END
-    B2 --> END
-    B3 --> END
-    C6 --> END
-
-    %% =========================================================
-    %% REAL TOOLS
-    %% =========================================================
-    subgraph S4[Real Executable Tools]
-        T1{{Tool: lookup_onboarding_requirements}}
-        T2{{Tool: search_training_catalog}}
-        T3{{Tool: create_it_workspace_request}}
-        T4{{Tool: check_employee_exists}}
-        T5{{Tool: register_employee}}
-    end
-
-    A1 -. function calling .-> T1
-    A3 -. tool invocation .-> T2
-    A5 -. tool invocation .-> T3
-    G3 -. tool invocation .-> T4
-    C4 -. second check and write .-> T5
-
-    %% =========================================================
-    %% SHARED STATE COMMUNICATION
-    %% =========================================================
-    STATE -. candidate and security fields .-> G1
-    G1 -. security_status, security_reason .-> STATE
-    G2 -. workflow_status .-> STATE
-    G3 -. employee_exists, duplicate_reason .-> STATE
-
-    STATE -. candidate and prior outputs .-> A1
-    A1 -. coordination_plan, tool_trace,<br/>onboarding_requirements .-> STATE
-    A2 -. extracted_skills, missing_skills,<br/>experience_summary .-> STATE
-    A3 -. training_plan .-> STATE
-    A4 -. contract_notification .-> STATE
-    A5 -. it_request, it_ticket_id,<br/>it_retry_count .-> STATE
-    A6 -. quality_score, review_feedback .-> STATE
-
-    C1 -. revision_count .-> STATE
-    C2 -. human_decision, human_comments .-> STATE
-    C3 -. public_summary with PII masking .-> STATE
-    C4 -. employee_registration .-> STATE
-    C5 -. final_package, completed status .-> STATE
-
-    %% =========================================================
-    %% PERSISTENCE, OBSERVABILITY, AND ARTIFACTS
-    %% =========================================================
-    subgraph S5[Persistence, Observability, and Generated Artifacts]
-        O1[(employee_registry.json)]
-        O2[(agent_events.jsonl)]
-        O3[(metrics.csv)]
-        O4[(IT ticket JSON)]
-        O5[(final_onboarding_package.json)]
-        O6[FastAPI<br/>GET /health<br/>POST /onboard/validate<br/>GET /latest-package]
-        O7[Dockerfile + requirements.txt]
-    end
-
-    T4 -. reads .-> O1
-    T5 -. reads/writes once .-> O1
-    T3 -. writes .-> O4
-    C5 -. writes .-> O5
-
-    GRAPH -. structured log_event() calls .-> O2
-    GRAPH -. latency, tool, retry,<br/>revision, failure metrics .-> O3
-
-    O6 -. duplicate validation returns 409 .-> O1
-    O6 -. serves latest package .-> O5
-    O7 -. deployment artifact for .-> O6
-
-    %% =========================================================
-    %% LEGEND / ARCHITECTURE NOTES
-    %% =========================================================
-    NOTE1["Coordination strategy:<br/>Centralized graph orchestration.<br/>LangGraph—not the Coordinator Agent—chooses the next node."]
-    NOTE2["Communication mechanism:<br/>All agents read and update the shared OnboardingState."]
-    NOTE3["Reasoning patterns:<br/>Plan-and-Execute, ReAct-style tool use,<br/>and Reviewer-driven Reflexion."]
-    NOTE4["Bounded loops:<br/>it_retry_count ≤ max_it_retries<br/>revision_count < max_revisions"]
-
-    GRAPH -.-> NOTE1
-    STATE -.-> NOTE2
-    A1 -.-> NOTE3
-    A5 -.-> NOTE4
+    A([START]) --> B[Input Guardrail Agent]
+    B -->|Blocked| X[Blocked End]
+    B -->|Safe| C[Employment Status Check]
+    C -->|Not hired| Y[Not-Hired End]
+    C -->|Hired| U[Employee Uniqueness Check]
+    U -->|Duplicate| Q[Duplicate Employee End]
+    U -->|New employee| D[Onboarding Coordinator Agent]
+    D --> E[Resume Analysis Agent]
+    E --> F[Training Plan Agent]
+    F --> G[Contract Notification Agent]
+    G --> H[IT Provisioning Agent]
+    H -->|Service failure| H
+    H -->|Ticket submitted| I[Reviewer Agent]
+    I -->|Score below threshold| J[Revision Coordinator]
+    J --> F
+    I -->|Approved| K{{Human Approval Interrupt}}
+    K -->|Revise| J
+    K -->|Rejected| Z[Rejected End]
+    K -->|Approved| L[Output Guardrail Agent]
+    L --> R[Employee Registration]
+    R -->|Duplicate race check| Q
+    R -->|Registered| M[Finalization Agent]
+    M --> N([END])
