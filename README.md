@@ -81,7 +81,7 @@ The system is designed to:
 
 ## Multi-Agent Architecture
 
-The system uses a **centralized hierarchical delegation strategy**.
+The system uses a **centralized graph orchestration with shared-state handoffs**.
 
 The Onboarding Coordinator Agent acts as the central supervisor. It creates the onboarding plan, invokes the requirements tool, stores the result in shared state, and delegates work to specialized agents.
 
@@ -230,9 +230,6 @@ The project explicitly implements several reasoning patterns.
 
 The Coordinator Agent first creates an ordered onboarding plan. The graph then executes that plan through specialized nodes.
 
-### Hierarchical Delegation
-
-The Coordinator acts as the supervisor and delegates responsibilities to the Resume, Training, Contract, IT, and Reviewer Agents.
 
 ### ReAct-Style Tool Use
 
