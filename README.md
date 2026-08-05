@@ -8,9 +8,9 @@ A secure, persistent, multi-agent HR onboarding system built with LangGraph, Gro
   
 > **Delivered by:** SDAIA Academy via Learning Space
 
-> **Trainer: Mohammed Albeladi
+> **Trainer:** Mohammed Albeladi
 
-> **Cohort/session dates:** **[August 2 - August 6]**
+> **Cohort/session dates:** **August 2 - August 6**
 
 ---
 
@@ -687,9 +687,9 @@ This project is an educational capstone and uses simulated enterprise services.
 
 | Team Member | Main Responsibilities |
 |---|---|
-| **[Moudi Alhomoud]** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
-| **[Shahad Alotaish]** | Specialized HR agents, function tools, templates, guardrails, and observability |
-| **[Noura Almuqbil]** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
+| **Moudi Alhomoud** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
+| **Shahad Alotaish** | Specialized HR agents, function tools, templates, guardrails, and observability |
+| **Noura Almuqbil** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
 
 ---
 
