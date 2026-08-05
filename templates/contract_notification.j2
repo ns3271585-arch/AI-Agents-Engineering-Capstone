@@ -1,0 +1,19 @@
+Subject: {{ subject }}
+
+Dear {{ candidate_name }},
+
+{{ welcome_paragraph }}
+
+Position: {{ position }}
+Department: {{ department }}
+Start date: {{ start_date }}
+Contact email: {{ email }}
+Contact phone: {{ phone }}
+
+Next steps:
+{% for step in next_steps %}
+- {{ step }}
+{% endfor %}
+
+Regards,
+Human Resources

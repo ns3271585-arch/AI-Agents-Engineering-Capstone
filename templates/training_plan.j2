@@ -1,0 +1,15 @@
+# Personalized Onboarding Training Plan
+
+**Employee:** {{ candidate_name }}
+**Position:** {{ position }}
+**Department:** {{ department }}
+
+## Selected courses
+{% for course in courses %}
+{{ loop.index }}. {{ course }}
+{% endfor %}
+
+## Rationale
+{{ rationale }}
+
+**Estimated total duration:** {{ estimated_hours }} hours
