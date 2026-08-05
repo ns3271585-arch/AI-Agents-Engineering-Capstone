@@ -2,15 +2,9 @@
 
 A secure, persistent, multi-agent HR onboarding system built with LangGraph, Groq, SQLite checkpointing, human approval, guardrails, structured observability, FastAPI, and Docker.
 
-> **Students:** Noura Almuqbil, Moudi Alhomoud, Shahad Alotaish
-
-> **Training program:** Advanced Agentic AI Systems Engineering
- 
-> **Delivered by:** SDAIA Academy
-
-> **Trainer:** Mohammed Albeladi
-
-> **Cohort/session dates:** **August 2 - August 6 2026**
+> **Training program:** Advanced Agentic AI Systems Engineering  
+> **Delivered by:** SDAIA Academy via Learning Space  
+> **Cohort/session dates:** **[ADD THE EXACT PROGRAM DATES BEFORE SUBMISSION]**
 
 ---
 
@@ -125,8 +119,7 @@ After human approval, the same registration tool performs a second uniqueness ch
 
 #### 3. Onboarding Coordinator Agent
 
-Creates the onboarding plan and retrieves department-specific requirements,
-while LangGraph controls execution order and conditional routing.
+Acts as the workflow supervisor.
 
 Responsibilities:
 
@@ -134,7 +127,7 @@ Responsibilities:
 - Apply Plan-and-Execute reasoning
 - Call the onboarding-requirements function tool
 - Store the tool result in shared state
-- Store the execution plan and requirements in shared state for use by specialized agent nodes
+- Coordinate the specialized agents
 
 #### 4. Resume Analysis Agent
 
@@ -258,73 +251,178 @@ The Reviewer Agent evaluates the generated package and returns structured feedba
 
 ---
 
-## Graph-Based Orchestration
+## Detailed System Architecture
 
-The system is implemented using a real LangGraph `StateGraph`.
+The project uses **centralized graph orchestration with shared-state communication**.
 
-The graph includes:
+The LangGraph `StateGraph` is the central orchestrator. It determines which node
+executes next through normal and conditional edges. The Onboarding Coordinator
+Agent creates an operational plan and performs requirements-tool calling, but it
+does not dynamically select the other agents. Specialized agents communicate by
+reading from and returning updates to the shared `OnboardingState`.
 
-- Named nodes
-- Directed edges
-- Shared state
-- Conditional edges
-- Multiple termination paths
-- An IT retry loop
-- A reviewer revision loop
-- A human approval interrupt
+The complete Mermaid architecture is available in
+[`architecture.mmd`](architecture.mmd).
 
-### Main Workflow
+### 1. Nodes
+
+A **node** is one executable stage in the LangGraph workflow.
+
+| Node | Agent or component | Main responsibility | State fields written |
+|---|---|---|---|
+| `input_guardrail` | Input Guardrail Agent | Detect prompt injection and policy-bypass attempts before tools or HR agents execute | `security_status`, `security_reason`, `workflow_status` |
+| `employment_check` | Employment Status Agent | Ensure onboarding starts only when `hired=True` | `workflow_status` |
+| `employee_uniqueness_check` | Employee Registry Agent | Check candidate ID and normalized email against the persistent employee registry | `employee_exists`, `duplicate_reason`, `existing_employee` |
+| `coordinator` | Onboarding Coordinator Agent | Create the operational plan and call the department-requirements tool | `coordination_plan`, `reasoning_trace`, `tool_trace`, `onboarding_requirements` |
+| `resume_analysis` | Resume Analysis Agent | Extract skills, identify gaps, and summarize experience | `extracted_skills`, `missing_skills`, `experience_summary` |
+| `training_plan` | Training Plan Agent | Select approved courses and render the personalized plan | `training_plan` |
+| `contract_notification` | Contract Notification Agent | Draft and render the onboarding notification | `contract_notification` |
+| `it_provisioning` | IT Provisioning Agent | Select least-privilege access/equipment and create an IT ticket | `it_request`, `it_ticket_id`, `it_status`, `it_retry_count` |
+| `review` | Reviewer Agent | Validate completeness and consistency; provide Reflexion feedback | `quality_score`, `review_feedback`, `workflow_status` |
+| `prepare_revision` | Revision Coordinator | Increment the revision counter before regenerating outputs | `revision_count`, `workflow_status` |
+| `human_approval` | HITL approval node | Pause with `interrupt()` and resume with `Command(resume=...)` | `human_decision`, `human_comments` |
+| `output_guardrail` | Output Guardrail Agent | Mask email, phone, IDs, API keys, tokens, and passwords in public output | `public_summary` |
+| `employee_registration` | Employee Registry Agent | Re-check uniqueness immediately before writing the employee once | `employee_registration`, duplicate fields |
+| `finalize` | Finalization Agent | Assemble and persist the approved onboarding package | `final_package`, `workflow_status` |
+| `blocked` | Terminal node | End unsafe requests | `errors`, `workflow_status` |
+| `not_hired` | Terminal node | End requests for candidates who are not hired | `workflow_status` |
+| `duplicate_employee` | Terminal node | Stop duplicate onboarding and prevent a second employee record | `errors`, `workflow_status` |
+| `rejected_end` | Terminal node | End a human-rejected onboarding package | `workflow_status` |
+
+### 2. Agents
+
+The system includes distinct named agents with separate responsibilities:
+
+1. **Input Guardrail Agent** — blocks unsafe instructions.
+2. **Employment Status Agent** — checks hiring eligibility.
+3. **Employee Registry Agent** — prevents duplicate employees and performs one-time registration.
+4. **Onboarding Coordinator Agent** — creates the plan and calls the requirements tool.
+5. **Resume Analysis Agent** — extracts skills and identifies gaps.
+6. **Training Plan Agent** — selects approved training and generates a plan.
+7. **Contract Notification Agent** — prepares the onboarding communication.
+8. **IT Provisioning Agent** — creates the least-privilege workspace request.
+9. **Reviewer Agent** — performs quality review and Reflexion.
+10. **Output Guardrail Agent** — protects sensitive public output.
+11. **Finalization Agent** — persists the approved package.
+
+Their communication mechanism is the shared `OnboardingState`; they do not use one
+prompt that merely imitates several personas.
+
+### 3. Tools
+
+The workflow calls real executable tools:
+
+| Tool | Called by | Purpose | Persistent result |
+|---|---|---|---|
+| `lookup_onboarding_requirements` | Coordinator Agent | Return mandatory training, default access, and equipment for the department and position | Stored in `onboarding_requirements` |
+| `search_training_catalog` | Training Plan Agent | Search the approved local catalogue using department and missing skills | Used to render the training plan |
+| `create_it_workspace_request` | IT Provisioning Agent | Create a structured IT ticket | `artifacts/IT-*.json` |
+| `check_employee_exists` | Employee Registry Agent | Check candidate ID and email before onboarding | Duplicate decision in shared state |
+| `register_employee` | Employee Registry Agent | Re-check uniqueness and write a new employee only once | `data/employee_registry.json` |
+
+The Coordinator’s requirements lookup is demonstrated through model-generated
+function calling, while the other tools are invoked through their executable tool interfaces.
+
+### 4. Edges and Conditions
+
+An **edge** determines how execution moves between nodes.
+
+#### Normal edges
 
 ```text
-START
-  ↓
-Input Guardrail
-  ├── Blocked → Blocked End
-  └── Safe
-        ↓
-Employment Status Check
-  ├── Not Hired → Not-Hired End
-  └── Hired
-        ↓
-Employee Uniqueness Check
-  ├── Existing Employee → Duplicate Employee End
-  └── New Employee
-        ↓
-Onboarding Coordinator Agent
-        ↓
-Resume Analysis Agent
-        ↓
-Training Plan Agent
-        ↓
-Contract Notification Agent
-        ↓
-IT Provisioning Agent
-  ├── Tool Failure → Retry IT Provisioning
-  └── Success
-        ↓
-Reviewer Agent
-  ├── Revision Required → Revision Coordinator → Training Plan Agent
-  └── Approved
-        ↓
-Human Approval Interrupt
-  ├── Revise → Revision Coordinator
-  ├── Reject → Rejected End
-  └── Approve
-        ↓
-Output Guardrail Agent
-        ↓
-Employee Registration + Second Duplicate Check
-  ├── Duplicate Detected → Duplicate Employee End
-  └── Registered
-        ↓
-Finalization Agent
-        ↓
-END
+coordinator
+→ resume_analysis
+→ training_plan
+→ contract_notification
+→ it_provisioning
+→ review
 ```
 
-The Mermaid source is also available in [`architecture.mmd`](architecture.mmd).
+#### Conditional edges
 
----
+| Source node | Condition | Destination |
+|---|---|---|
+| `input_guardrail` | Input is safe | `employment_check` |
+| `input_guardrail` | Prompt injection detected | `blocked` |
+| `employment_check` | `hired=True` | `employee_uniqueness_check` |
+| `employment_check` | `hired=False` | `not_hired` |
+| `employee_uniqueness_check` | No matching candidate ID/email | `coordinator` |
+| `employee_uniqueness_check` | Existing employee found | `duplicate_employee` |
+| `it_provisioning` | Ticket submitted | `review` |
+| `it_provisioning` | Failure and retry limit not exceeded | `it_provisioning` |
+| `review` | Score passes and package is approved | `human_approval` |
+| `review` | Revision needed and revision limit not exceeded | `prepare_revision` |
+| `human_approval` | Human approves | `output_guardrail` |
+| `human_approval` | Human requests revision | `prepare_revision` |
+| `human_approval` | Human rejects | `rejected_end` |
+| `employee_registration` | Second uniqueness check passes | `finalize` |
+| `employee_registration` | Duplicate detected before write | `duplicate_employee` |
+
+### 5. Loops
+
+The graph contains two genuine bounded loops:
+
+- **IT retry loop:** `it_provisioning → it_provisioning` while
+  `it_retry_count <= max_it_retries`.
+- **Reviewer revision loop:** `review → prepare_revision → training_plan` while
+  `revision_count < max_revisions`.
+
+Both loops terminate through explicit state conditions.
+
+### 6. Shared State
+
+`OnboardingState` is the workflow’s shared short-term memory. It carries:
+
+- Candidate inputs
+- Guardrail decisions
+- Employee-existence results
+- Coordinator plan and tool observations
+- Resume analysis
+- Training plan
+- Contract notification
+- IT request and retry counters
+- Reviewer score and feedback
+- Human decision
+- Registration result
+- Final package and errors
+
+Every node reads the state and returns only the fields it updates.
+
+### 7. Persistence and HITL
+
+The graph is compiled with `SqliteSaver` and a stable `thread_id`.
+
+The `human_approval` node calls `interrupt()`. The notebook demonstrates:
+
+1. Pausing before approval
+2. Closing the original SQLite connection
+3. Recreating the graph and checkpointer
+4. Recovering the same state and next node
+5. Resuming through `Command(resume=...)`
+
+### 8. Guardrails and Observability
+
+- The input guardrail blocks prompt injection before tools and HR agents execute.
+- The output guardrail masks PII and credentials.
+- `log_event()` writes structured events to `agent_events.jsonl`.
+- Metrics including latency, tool calls, retries, revisions, failures, and errors
+  are written to `metrics.csv`.
+
+### 9. Generated Outputs and Deployment
+
+The workflow generates:
+
+- Personalized training plan
+- Contract/onboarding notification
+- IT ticket JSON
+- Employee-registry record
+- Final onboarding package
+- JSONL event logs
+- CSV metrics
+
+The repository also includes FastAPI endpoints, a Dockerfile, and a dependency
+file as production/deployment artifacts.
+
 
 ## Shared State
 
@@ -512,8 +610,8 @@ The executed notebook demonstrates:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ns3271585-arch/AI-Agents-Engineering-Capstone.git
-cd AI-Agents-Engineering-Capstone
+git clone <YOUR_REPOSITORY_URL>
+cd HR-Onboarding-Agentic-System
 ```
 
 ### 2. Install dependencies
@@ -695,9 +793,9 @@ Replace the placeholders below with the team members’ names before submission.
 
 | Team Member | Main Responsibilities |
 |---|---|
-| **Moudi Alhomoud** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
-| **Shahad Alotaish** | Specialized HR agents, function tools, templates, guardrails, and observability |
-| **Noura Almuqbil** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
+| **[TEAM MEMBER 1 NAME]** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
+| **[TEAM MEMBER 2 NAME]** | Specialized HR agents, function tools, templates, guardrails, and observability |
+| **[TEAM MEMBER 3 NAME]** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
 
 ---
 
