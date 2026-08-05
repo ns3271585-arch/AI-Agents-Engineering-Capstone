@@ -1,0 +1,11 @@
+langgraph
+langgraph-checkpoint-sqlite
+langchain
+langchain-groq
+langsmith
+jinja2
+fastapi
+uvicorn
+httpx
+pandas
+pydantic[email]
