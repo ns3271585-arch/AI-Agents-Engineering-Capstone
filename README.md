@@ -6,7 +6,7 @@ A secure, persistent, multi-agent HR onboarding system built with LangGraph, Gro
 
 > **Training program:** Advanced Agentic AI Systems Engineering
  
-> **Delivered by:** SDAIA Academy via Learning Space
+> **Delivered by:** SDAIA Academy
 
 > **Trainer:** Mohammed Albeladi
 
