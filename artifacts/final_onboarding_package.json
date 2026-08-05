@@ -27,18 +27,16 @@
     "experience_summary": "Software engineering graduate with Python, SQL, Java, teamwork, communication, and Git experience. Completed two software projects and a summer internship."
   },
   "coordination_plan": [
-    "Assign HR Orientation to HR Team",
-    "Assign Information Security Awareness to IT Team",
-    "Assign Secure Development Standards to Engineering Manager",
-    "Provide default access to IT Team",
-    "Assign equipment to Facilities Team",
-    "Update department and position in HR system",
-    "Schedule a meeting with Engineering Manager for onboarding"
+    "Verify candidate paperwork and documentation",
+    "Assign departmental access and equipment",
+    "Schedule mandatory training sessions",
+    "Configure default access to company systems",
+    "Coordinate with IT for laptop and security key setup"
   ],
-  "training_plan": "# Personalized Onboarding Training Plan\n\n**Employee:** Sara Ahmed\n**Position:** Software Engineer\n**Department:** Engineering\n\n## Selected courses\n\n1. HR Orientation\n\n2. Information Security Awareness\n\n3. Secure Development Standards\n\n4. Internal Engineering Toolchain\n\n\n## Rationale\nAddressing skill gaps and mandatory courses, while adhering to approved catalogue options\n\n**Estimated total duration:** 40 hours",
+  "training_plan": "# Personalized Onboarding Training Plan\n\n**Employee:** Sara Ahmed\n**Position:** Software Engineer\n**Department:** Engineering\n\n## Selected courses\n\n1. HR Orientation\n\n2. Information Security Awareness\n\n3. Secure Development Standards\n\n4. Internal Engineering Toolchain\n\n\n## Rationale\nThe plan combines mandatory company training with courses that address the skill gaps identified by the Resume Analysis Agent.\n\n**Estimated total duration:** 14 hours",
   "contract_notification": "Subject: Welcome to the Engineering Team, Sara!\n\nDear Sara Ahmed,\n\nDear Sara, we are excited to welcome you to the Engineering team as a Software Engineer. Your start date is scheduled for August 10, 2026. We are looking forward to seeing the valuable contributions we know you will make. If you have any questions or concerns, please do not hesitate to reach out to your supervisor or HR representative.\n\nPosition: Software Engineer\nDepartment: Engineering\nStart date: 2026-08-10\nContact email: sara.ahmed@example.com\nContact phone: 0551234567\n\nNext steps:\n\n- Review and sign the onboarding documents\n\n- Complete the necessary paperwork\n\n- Attend the onboarding session on your first day\n\n\nRegards,\nHuman Resources",
   "it_request": {
-    "ticket_id": "IT-C-001-969EC9",
+    "ticket_id": "IT-C-001-A9B83A",
     "candidate_id": "C-001",
     "employee": "Sara Ahmed",
     "position": "Software Engineer",
@@ -55,24 +53,24 @@
       "Security Key"
     ],
     "status": "submitted",
-    "created_at": "2026-08-05T18:40:26.237419+00:00"
+    "created_at": "2026-08-05T19:42:19.185668+00:00"
   },
   "review": {
     "quality_score": 95,
-    "feedback": "- The onboarding package is well-structured and comprehensive.\n- The training plan is tailored to the candidate's role and department.\n- The contract notification is clear and concise.\n- The IT request is complete and accurate.\n- However, the package could benefit from a more detailed risk assessment and mitigation plan.",
+    "feedback": "- The onboarding package is well-structured and comprehensive.\n- The training plan is tailored to the candidate's role and skill gaps.\n- The contract notification is clear and concise.\n- The IT request is complete and includes all necessary details.\n- However, the package could benefit from a more detailed checklist of tasks for the candidate to complete before their start date.",
     "revision_count": 1
   },
   "human_approval": {
     "decision": "approved",
     "comments": "HR manager reviewed the documents and approved onboarding."
   },
-  "public_summary": "Onboarding completed for Sara Ahmed.\nEmail: [EMAIL REDACTED]\nPhone: [PHONE REDACTED]\nPosition: Software Engineer\nIT ticket: IT-C-001-969EC9\nContract notification:\nSubject: Welcome to the Engineering Team, Sara!\n\nDear Sara Ahmed,\n\nDear Sara, we are excited to welcome you to the Engineering team as a Software Engineer. Your start date is scheduled for August 10, 2026. We are looking forward to seeing the valuable contributions we know you will make. If you have any questions or concerns, please do not hesitate to reach out to your supervisor or HR representative.\n\nPosition: Software Engineer\nDepartment: Engineering\nStart date: 2026-08-10\nContact email: [EMAIL REDACTED]\nContact phone: [PHONE REDACTED]\n\nNext steps:\n\n- Review and sign the onboarding documents\n\n- Complete the necessary paperwork\n\n- Attend the onboarding session on your first day\n\n\nRegards,\nHuman Resources",
+  "public_summary": "Onboarding completed for Sara Ahmed.\nEmail: [EMAIL REDACTED]\nPhone: [PHONE REDACTED]\nPosition: Software Engineer\nIT ticket: IT-C-001-A9B83A\nContract notification:\nSubject: Welcome to the Engineering Team, Sara!\n\nDear Sara Ahmed,\n\nDear Sara, we are excited to welcome you to the Engineering team as a Software Engineer. Your start date is scheduled for August 10, 2026. We are looking forward to seeing the valuable contributions we know you will make. If you have any questions or concerns, please do not hesitate to reach out to your supervisor or HR representative.\n\nPosition: Software Engineer\nDepartment: Engineering\nStart date: 2026-08-10\nContact email: [EMAIL REDACTED]\nContact phone: [PHONE REDACTED]\n\nNext steps:\n\n- Review and sign the onboarding documents\n\n- Complete the necessary paperwork\n\n- Attend the onboarding session on your first day\n\n\nRegards,\nHuman Resources",
   "employee_registration": {
     "created": true,
     "status": "registered",
     "reason": "Employee was not present and has been registered.",
     "employee": {
-      "employee_id": "EMP-7E4C22A5",
+      "employee_id": "EMP-0EA268B5",
       "candidate_id": "C-001",
       "candidate_name": "Sara Ahmed",
       "email": "sara.ahmed@example.com",
@@ -80,9 +78,9 @@
       "position": "Software Engineer",
       "department": "Engineering",
       "start_date": "2026-08-10",
-      "registered_at": "2026-08-05T18:41:21.382424+00:00",
+      "registered_at": "2026-08-05T19:42:27.367636+00:00",
       "status": "active"
     }
   },
-  "completed_at": "2026-08-05T18:41:21.385797+00:00"
+  "completed_at": "2026-08-05T19:42:27.370193+00:00"
 }

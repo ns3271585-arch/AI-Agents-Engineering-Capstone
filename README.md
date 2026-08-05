@@ -2,15 +2,9 @@
 
 A secure, persistent, multi-agent HR onboarding system built with LangGraph, Groq, SQLite checkpointing, human approval, guardrails, structured observability, FastAPI, and Docker.
 
-> **Students:** Noura Almuqbil, Moudi Alhomoud, Shahad Alotaish
-
-> **Training program:** Advanced Agentic AI Systems Engineering
-  
-> **Delivered by:** SDAIA Academy via Learning Space
-
-> **Trainer:** Mohammed Albeladi
-
-> **Cohort/session dates:** **August 2 - August 6**
+> **Training program:** Advanced Agentic AI Systems Engineering  
+> **Delivered by:** SDAIA Academy via Learning Space  
+> **Cohort/session dates:** **[ADD THE EXACT PROGRAM DATES BEFORE SUBMISSION]**
 
 ---
 
@@ -26,7 +20,7 @@ This project addresses that problem through a LangGraph workflow that coordinate
 
 The workflow begins only after the candidate’s employment status is marked as `hired`. Before any onboarding agent or HR tool executes, an input guardrail checks the candidate information and resume for prompt-injection or policy-bypass attempts. The system then checks a persistent employee registry using the candidate ID and normalized email address. Unsafe inputs and existing employees are stopped before onboarding work begins.
 
-For a valid hired candidate, the Onboarding Coordinator Agent creates an ordered plan and retrieves department-specific onboarding requirements through a real function tool. The workflow then delegates tasks to specialized agents that analyze the resume, identify skill gaps, generate a personalized training plan, prepare an onboarding notification, and create a simulated IT workspace request.
+For a valid hired candidate, the Onboarding Coordinator Agent creates an ordered plan and retrieves department-specific onboarding requirements through a real function tool. The `StateGraph` then routes execution through specialized agents that analyze the resume, identify skill gaps, generate a personalized training plan, prepare an onboarding notification, and create a simulated IT workspace request.
 
 A Reviewer Agent evaluates the complete onboarding package for correctness, completeness, mandatory training coverage, appropriate IT access, and consistency. If deficiencies are detected, the graph follows a revision edge and regenerates the affected outputs. The revision loop is bounded by a maximum revision counter so the workflow cannot continue indefinitely.
 
@@ -81,9 +75,18 @@ The system is designed to:
 
 ## Multi-Agent Architecture
 
-The system uses a **centralized graph orchestration with shared-state handoffs**.
+The system uses a **centralized graph-orchestration strategy with shared-state communication**.
 
-The Onboarding Coordinator Agent acts as the central supervisor. It creates the onboarding plan, invokes the requirements tool, stores the result in shared state, and delegates work to specialized agents.
+The LangGraph `StateGraph` acts as the central orchestrator. It routes execution among specialized agents through predefined and conditional edges. The Onboarding Coordinator Agent creates the onboarding plan and retrieves department-specific requirements, while all agents communicate by reading and updating the shared `OnboardingState`.
+
+
+### Coordination Strategy
+
+The project uses **centralized graph orchestration**. LangGraph determines which
+node executes next through normal and conditional edges. The specialized agents
+communicate through the shared `OnboardingState`. The Coordinator Agent creates
+the onboarding plan and performs requirements-tool calling, but it does not
+dynamically select or invoke the other agents.
 
 ### Agents and Responsibilities
 
@@ -238,7 +241,7 @@ The Coordinator follows a visible operational sequence:
 1. Thought summary: determine which onboarding requirements are needed.
 2. Action: call the onboarding-requirements tool.
 3. Observation: receive the department-specific result.
-4. Plan: delegate execution to specialized agents.
+4. Plan: record the onboarding steps that the `StateGraph` will execute through specialized agent nodes.
 
 The project stores a concise reasoning trace and tool trace without exposing hidden chain-of-thought.
 
@@ -502,8 +505,8 @@ The executed notebook demonstrates:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ns3271585-arch/AI-Agents-Engineering-Capstone.git
-cd AI-Agents-Engineering-Capstone
+git clone <YOUR_REPOSITORY_URL>
+cd HR-Onboarding-Agentic-System
 ```
 
 ### 2. Install dependencies
@@ -681,12 +684,13 @@ This project is an educational capstone and uses simulated enterprise services.
 
 ## Team Responsibilities
 
+Replace the placeholders below with the team members’ names before submission.
 
 | Team Member | Main Responsibilities |
 |---|---|
-| **Moudi Alhomoud** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
-| **Shahad Alotaish** | Specialized HR agents, function tools, templates, guardrails, and observability |
-| **Noura Almuqbil** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
+| **[TEAM MEMBER 1 NAME]** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
+| **[TEAM MEMBER 2 NAME]** | Specialized HR agents, function tools, templates, guardrails, and observability |
+| **[TEAM MEMBER 3 NAME]** | SQLite persistence, human-in-the-loop approval, FastAPI, Docker, GitHub integration, and final execution evidence |
 
 ---
 
@@ -696,6 +700,7 @@ This project was completed as part of the:
 
 **Advanced Agentic AI Systems Engineering Program**  
 **SDAIA Academy, delivered via Learning Space**  
+**Cohort/session dates:** **[ADD THE EXACT PROGRAM DATES BEFORE SUBMISSION]**
 
 SDAIA Academy GitHub: <https://github.com/SDAIAAcademy>
 
