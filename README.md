@@ -125,7 +125,8 @@ After human approval, the same registration tool performs a second uniqueness ch
 
 #### 3. Onboarding Coordinator Agent
 
-Acts as the workflow supervisor.
+Creates the onboarding plan and retrieves department-specific requirements,
+while LangGraph controls execution order and conditional routing.
 
 Responsibilities:
 
@@ -133,7 +134,7 @@ Responsibilities:
 - Apply Plan-and-Execute reasoning
 - Call the onboarding-requirements function tool
 - Store the tool result in shared state
-- Coordinate the specialized agents
+- Store the execution plan and requirements in shared state for use by specialized agent nodes
 
 #### 4. Resume Analysis Agent
 
