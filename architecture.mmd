@@ -3,7 +3,9 @@ flowchart TD
     B -->|Blocked| X[Blocked End]
     B -->|Safe| C[Employment Status Check]
     C -->|Not hired| Y[Not-Hired End]
-    C -->|Hired| D[Onboarding Coordinator Agent]
+    C -->|Hired| U[Employee Uniqueness Check]
+    U -->|Duplicate| Q[Duplicate Employee End]
+    U -->|New employee| D[Onboarding Coordinator Agent]
     D --> E[Resume Analysis Agent]
     E --> F[Training Plan Agent]
     F --> G[Contract Notification Agent]
@@ -16,5 +18,7 @@ flowchart TD
     K -->|Revise| J
     K -->|Rejected| Z[Rejected End]
     K -->|Approved| L[Output Guardrail Agent]
-    L --> M[Finalization Agent]
+    L --> R[Employee Registration]
+    R -->|Duplicate race check| Q
+    R -->|Registered| M[Finalization Agent]
     M --> N([END])

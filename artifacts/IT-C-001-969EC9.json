@@ -1,0 +1,20 @@
+{
+  "ticket_id": "IT-C-001-969EC9",
+  "candidate_id": "C-001",
+  "employee": "Sara Ahmed",
+  "position": "Software Engineer",
+  "department": "Engineering",
+  "start_date": "2026-08-10",
+  "requested_access": [
+    "Company Email",
+    "VPN",
+    "GitHub Organization",
+    "CI/CD Platform"
+  ],
+  "equipment": [
+    "Laptop",
+    "Security Key"
+  ],
+  "status": "submitted",
+  "created_at": "2026-08-05T18:40:26.237419+00:00"
+}

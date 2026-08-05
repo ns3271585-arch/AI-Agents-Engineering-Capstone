@@ -15,6 +15,7 @@ app = FastAPI(
 
 BASE_DIR = Path(__file__).resolve().parent
 PACKAGE_PATH = BASE_DIR / "artifacts" / "final_onboarding_package.json"
+REGISTRY_PATH = BASE_DIR / "data" / "employee_registry.json"
 
 class OnboardingRequest(BaseModel):
     candidate_id: str
@@ -26,6 +27,24 @@ class OnboardingRequest(BaseModel):
     department: str
     start_date: str
     hired: bool
+
+def employee_exists(candidate_id: str, email: str) -> bool:
+    if not REGISTRY_PATH.exists():
+        return False
+
+    try:
+        records = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+
+    candidate_id = candidate_id.strip().lower()
+    email = email.strip().lower()
+
+    return any(
+        str(record.get("candidate_id", "")).strip().lower() == candidate_id
+        or str(record.get("email", "")).strip().lower() == email
+        for record in records
+    )
 
 def contains_prompt_injection(text: str) -> bool:
     patterns = [
@@ -54,6 +73,12 @@ def validate_onboarding(request: OnboardingRequest):
             "status": "not_hired",
             "candidate_id": request.candidate_id,
         }
+
+    if employee_exists(request.candidate_id, str(request.email)):
+        raise HTTPException(
+            status_code=409,
+            detail="Employee already exists; duplicate onboarding blocked.",
+        )
 
     return {
         "accepted": True,
