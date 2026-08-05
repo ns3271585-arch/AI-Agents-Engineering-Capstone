@@ -505,8 +505,8 @@ The executed notebook demonstrates:
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-cd HR-Onboarding-Agentic-System
+git clone https://github.com/ns3271585-arch/AI-Agents-Engineering-Capstone.git
+cd AI-Agents-Engineering-Capstone
 ```
 
 ### 2. Install dependencies
@@ -684,7 +684,6 @@ This project is an educational capstone and uses simulated enterprise services.
 
 ## Team Responsibilities
 
-Replace the placeholders below with the team members’ names before submission.
 
 | Team Member | Main Responsibilities |
 |---|---|
