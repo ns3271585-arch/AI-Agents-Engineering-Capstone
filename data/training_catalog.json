@@ -1,0 +1,75 @@
+[
+  {
+    "course_id": "HR-101",
+    "name": "HR Orientation",
+    "departments": [
+      "All"
+    ],
+    "skills": [
+      "company policies",
+      "onboarding"
+    ],
+    "duration_hours": 2
+  },
+  {
+    "course_id": "SEC-101",
+    "name": "Information Security Awareness",
+    "departments": [
+      "All"
+    ],
+    "skills": [
+      "information security",
+      "data protection"
+    ],
+    "duration_hours": 2
+  },
+  {
+    "course_id": "ENG-201",
+    "name": "Secure Development Standards",
+    "departments": [
+      "Engineering"
+    ],
+    "skills": [
+      "secure development",
+      "code review"
+    ],
+    "duration_hours": 6
+  },
+  {
+    "course_id": "ENG-220",
+    "name": "Internal Engineering Toolchain",
+    "departments": [
+      "Engineering"
+    ],
+    "skills": [
+      "git",
+      "ci/cd",
+      "internal tools"
+    ],
+    "duration_hours": 4
+  },
+  {
+    "course_id": "FIN-201",
+    "name": "Financial Compliance",
+    "departments": [
+      "Finance"
+    ],
+    "skills": [
+      "compliance",
+      "financial controls"
+    ],
+    "duration_hours": 4
+  },
+  {
+    "course_id": "HR-220",
+    "name": "HR Data Privacy",
+    "departments": [
+      "Human Resources"
+    ],
+    "skills": [
+      "privacy",
+      "employee data"
+    ],
+    "duration_hours": 4
+  }
+]
