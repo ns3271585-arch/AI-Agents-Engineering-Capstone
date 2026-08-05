@@ -3,9 +3,13 @@
 A secure, persistent, multi-agent HR onboarding system built with LangGraph, Groq, SQLite checkpointing, human approval, guardrails, structured observability, FastAPI, and Docker.
 
 > **Students:** Noura Almuqbil, Moudi Alhomoud, Shahad Alotaish
-> **Training program:** Advanced Agentic AI Systems Engineering  
+
+> **Training program:** Advanced Agentic AI Systems Engineering
+  
 > **Delivered by:** SDAIA Academy via Learning Space
+
 > **Trainer: Mohammed Albeladi
+
 > **Cohort/session dates:** **[August 2 - August 6]**
 
 ---
