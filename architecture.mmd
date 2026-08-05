@@ -1,138 +1,24 @@
 flowchart TD
-
-    START([START])
-    INPUT["Candidate input<br/>ID, name, email, phone, resume,<br/>position, department, start date, hired"]
-    GRAPH["LangGraph StateGraph<br/>Centralized graph orchestration"]
-    STATE["Shared OnboardingState<br/>Workflow memory"]
-    CHECKPOINT["SqliteSaver<br/>Persistent checkpoints by thread ID"]
-
-    START --> INPUT
-    INPUT --> G1
-    GRAPH -.->|"Controls node order and routing"| G1
-    GRAPH -.->|"Compiled with"| CHECKPOINT
-    STATE -.->|"Read and updated by all nodes"| GRAPH
-
-    subgraph S1["Security, eligibility, and duplicate prevention"]
-        G1["Node: input_guardrail<br/>Agent: Input Guardrail Agent"]
-        G2["Node: employment_check<br/>Agent: Employment Status Agent"]
-        G3["Node: employee_uniqueness_check<br/>Agent: Employee Registry Agent"]
-        B1["Node: blocked<br/>Terminal security path"]
-        B2["Node: not_hired<br/>Terminal eligibility path"]
-        B3["Node: duplicate_employee<br/>Terminal duplicate path"]
-    end
-
-    G1 -->|"Safe input"| G2
-    G1 -->|"Prompt injection detected"| B1
-    G2 -->|"Candidate is hired"| G3
-    G2 -->|"Candidate is not hired"| B2
-    G3 -->|"Employee is new"| A1
-    G3 -->|"Candidate ID or email already exists"| B3
-
-    subgraph S2["Specialized multi-agent workflow"]
-        A1["Node: coordinator<br/>Agent: Onboarding Coordinator Agent"]
-        A2["Node: resume_analysis<br/>Agent: Resume Analysis Agent"]
-        A3["Node: training_plan<br/>Agent: Training Plan Agent"]
-        A4["Node: contract_notification<br/>Agent: Contract Notification Agent"]
-        A5["Node: it_provisioning<br/>Agent: IT Provisioning Agent"]
-        A6["Node: review<br/>Agent: Reviewer Agent"]
-    end
-
-    A1 --> A2
-    A2 --> A3
-    A3 --> A4
-    A4 --> A5
-    A5 -->|"IT request submitted"| A6
-    A5 -->|"Failure and retry limit not exceeded"| A5
-
-    subgraph S3["Revision, HITL, registration, and finalization"]
-        C1["Node: prepare_revision<br/>Agent: Revision Coordinator"]
-        C2{"Node: human_approval<br/>Real HITL interrupt and resume"}
-        C3["Node: output_guardrail<br/>Agent: Output Guardrail Agent"]
-        C4["Node: employee_registration<br/>Agent: Employee Registry Agent"]
-        C5["Node: finalize<br/>Agent: Finalization Agent"]
-        C6["Node: rejected_end<br/>Terminal rejection path"]
-        FINISH([END])
-    end
-
-    A6 -->|"Quality score passes and package approved"| C2
-    A6 -->|"Revision required and limit not exceeded"| C1
-    C1 -->|"Increment revision count"| A3
-
-    C2 -->|"Human approves"| C3
-    C2 -->|"Human requests revision"| C1
-    C2 -->|"Human rejects"| C6
-
-    C3 --> C4
-    C4 -->|"Second uniqueness check passes"| C5
-    C4 -->|"Duplicate detected before write"| B3
-    C5 --> FINISH
-
-    B1 --> FINISH
-    B2 --> FINISH
-    B3 --> FINISH
-    C6 --> FINISH
-
-    subgraph S4["Real executable tools"]
-        T1["Tool: lookup_onboarding_requirements"]
-        T2["Tool: search_training_catalog"]
-        T3["Tool: create_it_workspace_request"]
-        T4["Tool: check_employee_exists"]
-        T5["Tool: register_employee"]
-    end
-
-    A1 -.->|"LLM function call"| T1
-    A3 -.->|"Tool invocation"| T2
-    A5 -.->|"Tool invocation"| T3
-    G3 -.->|"Tool invocation"| T4
-    C4 -.->|"Second check and registry write"| T5
-
-    STATE -.->|"Security fields"| G1
-    G1 -.->|"Security status and reason"| STATE
-    G2 -.->|"Eligibility status"| STATE
-    G3 -.->|"Employee exists and duplicate reason"| STATE
-
-    STATE -.->|"Candidate data and previous outputs"| A1
-    A1 -.->|"Plan, requirements, tool trace"| STATE
-    A2 -.->|"Skills, gaps, experience summary"| STATE
-    A3 -.->|"Training plan"| STATE
-    A4 -.->|"Contract notification"| STATE
-    A5 -.->|"IT request, ticket, retry count"| STATE
-    A6 -.->|"Quality score and review feedback"| STATE
-
-    C1 -.->|"Revision count"| STATE
-    C2 -.->|"Human decision and comments"| STATE
-    C3 -.->|"Masked public summary"| STATE
-    C4 -.->|"Employee registration result"| STATE
-    C5 -.->|"Final package and completed status"| STATE
-
-    subgraph S5["Persistence, observability, outputs, and deployment"]
-        O1["data/employee_registry.json"]
-        O2["artifacts/agent_events.jsonl"]
-        O3["artifacts/metrics.csv"]
-        O4["artifacts/IT ticket JSON"]
-        O5["artifacts/final_onboarding_package.json"]
-        O6["FastAPI<br/>GET health<br/>POST onboard validate<br/>GET latest package"]
-        O7["Dockerfile and requirements.txt"]
-    end
-
-    T4 -.->|"Reads"| O1
-    T5 -.->|"Reads and writes once"| O1
-    T3 -.->|"Writes"| O4
-    C5 -.->|"Writes"| O5
-
-    GRAPH -.->|"Structured event logging"| O2
-    GRAPH -.->|"Latency, tools, retries, revisions, failures"| O3
-
-    O6 -.->|"Duplicate validation returns HTTP 409"| O1
-    O6 -.->|"Serves latest package"| O5
-    O7 -.->|"Deployment artifacts for"| O6
-
-    N1["Coordination strategy<br/>Centralized graph orchestration"]
-    N2["Communication mechanism<br/>Shared OnboardingState"]
-    N3["Reasoning patterns<br/>Plan and Execute, ReAct-style tool use,<br/>Reviewer-driven Reflexion"]
-    N4["Bounded loops<br/>IT retry limit and reviewer revision limit"]
-
-    GRAPH -.-> N1
-    STATE -.-> N2
-    A1 -.-> N3
-    A5 -.-> N4
+    A([START]) --> B[Input Guardrail Agent]
+    B -->|Blocked| X[Blocked End]
+    B -->|Safe| C[Employment Status Check]
+    C -->|Not hired| Y[Not-Hired End]
+    C -->|Hired| U[Employee Uniqueness Check]
+    U -->|Duplicate| Q[Duplicate Employee End]
+    U -->|New employee| D[Onboarding Coordinator Agent]
+    D --> E[Resume Analysis Agent]
+    E --> F[Training Plan Agent]
+    F --> G[Contract Notification Agent]
+    G --> H[IT Provisioning Agent]
+    H -->|Service failure| H
+    H -->|Ticket submitted| I[Reviewer Agent]
+    I -->|Score below threshold| J[Revision Coordinator]
+    J --> F
+    I -->|Approved| K{{Human Approval Interrupt}}
+    K -->|Revise| J
+    K -->|Rejected| Z[Rejected End]
+    K -->|Approved| L[Output Guardrail Agent]
+    L --> R[Employee Registration]
+    R -->|Duplicate race check| Q
+    R -->|Registered| M[Finalization Agent]
+    M --> N([END])
