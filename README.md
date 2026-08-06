@@ -795,8 +795,6 @@ This project is an educational capstone and uses simulated enterprise services.
 
 ## Team Responsibilities
 
-Replace the placeholders below with the team members’ names before submission.
-
 | Team Member | Main Responsibilities |
 |---|---|
 | **Moudi Alhomoud** | Agentic reasoning, shared state, LangGraph nodes, edges, conditional routing, retry and revision loops |
